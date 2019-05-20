@@ -2,7 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const { messageSchema } = require('./messageSchema')
 const { toState } = require('./toState')
-const { unencode } = require('../encoding')
+const { unencode } = require('./encoding')
 const Ajv = require('ajv')
 
 const Server = ({ log }) => {
