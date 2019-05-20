@@ -6,7 +6,8 @@ const { encode } = require('../encoding')
 describe('POST /', () => {
   describe('with a malformed Pub/Sub message', () => {
     it('returns a 400', async () => {
-      const response = await request(Server({ log: jest.fn() }))
+      const server = Server({ log: jest.fn(), createStatus: jest.fn() })
+      const response = await request(server)
         .post('/')
         .send({
           foo: 'bar',
@@ -16,8 +17,9 @@ describe('POST /', () => {
     })
 
     it('logs helpful errors to STDOUT so it will be seen in Stackdriver', async () => {
-      mockStdout = jest.fn()
-      const response = await request(Server({ log: mockStdout }))
+      const mockStdout = jest.fn()
+      const server = Server({ log: mockStdout, createStatus: jest.fn() })
+      const response = await request(server)
         .post('/')
         .send({
           foo: 'bar',
@@ -32,7 +34,8 @@ describe('POST /', () => {
 
   describe('with a well formed Pub/Sub message', () => {
     it('acks the message with a 204 success status', async () => {
-      const response = await request(Server({ log: jest.fn() }))
+      const server = Server({ log: jest.fn(), createStatus: jest.fn() })
+      const response = await request(server)
         .post('/')
         .send({
           message: {

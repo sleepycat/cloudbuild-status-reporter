@@ -5,7 +5,7 @@ const { toState } = require('./toState')
 const { unencode } = require('./encoding')
 const Ajv = require('ajv')
 
-const Server = ({ log }) => {
+const Server = ({ log, createStatus }) => {
   const app = express()
 
   let builds = {}
@@ -26,6 +26,8 @@ const Server = ({ log }) => {
     const pubsubMessage = req.body.message
     const data = unencode(pubsubMessage.data)
     const { message, state } = toState(pubsubMessage.attributes.status)
+		// TODO: What if the repo name has an underscore?
+    const [_org, _user, repo] = data.source.repoSource.repoName.split('_')
     builds = Object.assign(
       {},
       {
@@ -34,7 +36,7 @@ const Server = ({ log }) => {
           target_url: data.logUrl,
           description: message,
           owner: 'sleepycat',
-          repo: data.source.repoSource.repoName.replace('sleepycat_', ''),
+          repo,
           sha: data.sourceProvenance.resolvedRepoSource.commitSha,
           context: 'CloudBuild',
         },
@@ -42,8 +44,9 @@ const Server = ({ log }) => {
     )
 
     for (let buildId of Object.keys(builds)) {
-      // TODO: create a Github status for each build
-      log(buildId)
+      // TODO: this is optimistic. What if this goes wrong?
+      log('creating status: ', builds[buildId])
+      createStatus(builds[buildId])
     }
 
     res.status(204).send()
