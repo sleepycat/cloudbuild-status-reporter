@@ -1,0 +1,36 @@
+{
+  "name": "platform-challenge-github-notifier",
+  "version": "1.0.0",
+  "description": "A cloud function for Google Cloud to notify a GitHub Repo about Cloud Build status",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dbg": "node --inspect-brk node_modules/.bin/jest --runInBand",
+    "test": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cds-snc/platform-challenge.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cds-snc/platform-challenge/issues"
+  },
+  "homepage": "https://github.com/cds-snc/platform-challenge#readme",
+  "dependencies": {
+    "@octokit/rest": "^16.25.5",
+    "ajv": "^6.10.0",
+    "djv": "^2.1.2",
+    "express": "^4.17.0"
+  },
+  "devDependencies": {
+    "jest": "^24.8.0",
+    "supertest": "^4.0.2",
+    "uuid": "^3.3.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "verbose": true
+  }
+}
