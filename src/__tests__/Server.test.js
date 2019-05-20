@@ -1,9 +1,7 @@
 const request = require('supertest')
 const uuid = require('uuid/v4')
 const { Server } = require('../Server')
-
-const encode = data =>
-  Buffer.from(JSON.stringify(data, 'utf8')).toString('base64')
+const { encode } = require('../encoding')
 
 describe('POST /', () => {
   describe('with a malformed Pub/Sub message', () => {

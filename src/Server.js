@@ -2,9 +2,8 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const { messageSchema } = require('./messageSchema')
 const { toState } = require('./toState')
+const { unencode } = require('../encoding')
 const Ajv = require('ajv')
-
-const unencode = data => JSON.parse(Buffer.from(data, 'base64').toString())
 
 const Server = ({ log }) => {
   const app = express()
@@ -43,7 +42,7 @@ const Server = ({ log }) => {
     )
 
     for (let buildId of Object.keys(builds)) {
-			// TODO: create a Github status for each build
+      // TODO: create a Github status for each build
       log(buildId)
     }
 
