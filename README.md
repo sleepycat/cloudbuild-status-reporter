@@ -11,8 +11,11 @@ cloud-builds topic.
 We can subscribe our Cloud Run endpoint to that topic with the following command:
 
 ```sh
-gcloud beta run deploy reporter --image gcr.io/propertygraph/reporter
+gcloud beta run deploy --region=us-central1
+--set-env-vars=GITHUB_TOKEN=abc123,REPO_NAME=foo,REPO_OWNER=bar
+--image gcr.io/propertygraph/reporter reporter
 
+# Take the URL that command gives you and use it as a pubsub endpoint:
 gcloud pubsub subscriptions create \	
 	--push-endpoint=https://your-cloud.run.app \
 	--topic=cloud-builds cbrun
