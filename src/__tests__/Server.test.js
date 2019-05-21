@@ -6,7 +6,10 @@ const { encode } = require('../encoding')
 describe('POST /', () => {
   describe('with a malformed Pub/Sub message', () => {
     it('returns a 400', async () => {
-      const server = Server({ log: jest.fn(), createStatus: jest.fn() })
+      const server = Server({
+        log: jest.fn(),
+        createStatus: jest.fn(),
+      })
       const response = await request(server)
         .post('/')
         .send({
@@ -18,7 +21,10 @@ describe('POST /', () => {
 
     it('logs helpful errors to STDOUT so it will be seen in Stackdriver', async () => {
       const mockStdout = jest.fn()
-      const server = Server({ log: mockStdout, createStatus: jest.fn() })
+      const server = Server({
+        log: mockStdout,
+        createStatus: jest.fn(),
+      })
       const response = await request(server)
         .post('/')
         .send({
@@ -34,7 +40,10 @@ describe('POST /', () => {
 
   describe('with a well formed Pub/Sub message', () => {
     it('acks the message with a 204 success status', async () => {
-      const server = Server({ log: jest.fn(), createStatus: jest.fn() })
+      const server = Server({
+        log: jest.fn(),
+        createStatus: jest.fn(),
+      })
       const response = await request(server)
         .post('/')
         .send({
@@ -108,6 +117,68 @@ describe('POST /', () => {
           },
         })
 
+      expect(response.status).toEqual(204)
+    })
+  })
+
+  describe('with a non-Github Pub/Sub message', () => {
+    it(`doesn't send a status to github and returns 204`, async () => {
+      const mockCreateStatus = jest.fn()
+      const server = Server({
+        log: jest.fn(),
+        createStatus: mockCreateStatus,
+      })
+      const response = await request(server)
+        .post('/')
+        .send({
+          message: {
+            attributes: {
+              buildId: '3c2c30c1-d563-496a-a97e-bf3bcc561c74',
+              status: 'QUEUED',
+            },
+            data: encode({
+              id: 'edd4db3a-e831-48d8-8fe1-23a2cc9a8bba',
+              projectId: 'propertygraph',
+              status: 'QUEUED',
+              source: {
+                storageSource: {
+                  bucket: 'propertygraph_cloudbuild',
+                  object:
+                    'source/1558365793.99-a2fa3a137cf845f8b00c073370fd74bf.tgz',
+                  generation: '1558365794711726',
+                },
+              },
+              steps: [
+                {
+                  name: 'gcr.io/kaniko-project/executor:latest',
+                  args: [Array],
+                },
+              ],
+              createTime: '2019-05-20T15:23:15.054616862Z',
+              timeout: '600s',
+              logsBucket:
+                'gs://861907550287.cloudbuild-logs.googleusercontent.com',
+              sourceProvenance: {
+                resolvedStorageSource: {
+                  bucket: 'propertygraph_cloudbuild',
+                  object:
+                    'source/1558365793.99-a2fa3a137cf845f8b00c073370fd74bf.tgz',
+                  generation: '1558365794711726',
+                },
+              },
+              options: { logging: 'LEGACY' },
+              logUrl:
+                'https://console.cloud.google.com/gcr/builds/edd4db3a-e831-48d8-8fe1-23a2cc9a8bba?project=861907550287',
+              tags: [],
+            }),
+            messageId: '553785523340334',
+            message_id: '553785523340334',
+            publishTime: '2019-05-19T21:20:15.109Z',
+            publish_time: '2019-05-19T21:20:15.109Z',
+          },
+        })
+
+      expect(mockCreateStatus).not.toHaveBeenCalled()
       expect(response.status).toEqual(204)
     })
   })

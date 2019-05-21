@@ -9,6 +9,15 @@ const octokit = Octokit({
 
 const server = Server({
   log: console.log,
-  createStatus: status => octokit.repos.createStatus(data),
+  createStatus: status =>
+    octokit.repos.createStatus(
+      Object.assign(
+        {
+          repo: process.env.REPO_NAME,
+          owner: process.env.REPO_OWNER,
+        },
+        data,
+      ),
+    ),
 })
 server.listen(PORT, () => console.log(`🚀 listening on port ${PORT}`))

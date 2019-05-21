@@ -22,12 +22,21 @@ const Server = ({ log, createStatus }) => {
       return
     }
 
-    log('the whole event:', JSON.stringify(req.body.message))
     const pubsubMessage = req.body.message
     const data = unencode(pubsubMessage.data)
+
+    if (!data.sourceProvenance.resolvedRepoSource) {
+      // Anything coming from Github will have a resolvedRepoSource. Someone is
+      // using clouldbuild directly, so ack with a 200, 201, 202, 204, or 102
+      // so it doesn't get resent, but do nothing.
+      res.status(204).send(`No Content`)
+      return
+    }
+
+    log('the whole event:', JSON.stringify(req.body.message))
+
     const { message, state } = toState(pubsubMessage.attributes.status)
-		// TODO: What if the repo name has an underscore?
-    const [_org, _user, repo] = data.source.repoSource.repoName.split('_')
+
     builds = Object.assign(
       {},
       {
@@ -35,8 +44,6 @@ const Server = ({ log, createStatus }) => {
           state,
           target_url: data.logUrl,
           description: message,
-          owner: 'sleepycat',
-          repo,
           sha: data.sourceProvenance.resolvedRepoSource.commitSha,
           context: 'CloudBuild',
         },
@@ -49,7 +56,7 @@ const Server = ({ log, createStatus }) => {
       createStatus(builds[buildId])
     }
 
-    res.status(204).send()
+    res.status(204).send('No Content')
   })
 
   return app
