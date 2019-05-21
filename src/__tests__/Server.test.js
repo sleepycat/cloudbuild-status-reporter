@@ -1,5 +1,4 @@
 const request = require('supertest')
-const uuid = require('uuid/v4')
 const { Server } = require('../Server')
 const { encode } = require('../encoding')
 
@@ -25,7 +24,7 @@ describe('POST /', () => {
         log: mockStdout,
         createStatus: jest.fn(),
       })
-      const response = await request(server)
+      await request(server)
         .post('/')
         .send({
           foo: 'bar',
