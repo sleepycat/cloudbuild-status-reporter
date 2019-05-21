@@ -16,7 +16,7 @@ const server = Server({
           repo: process.env.REPO_NAME,
           owner: process.env.REPO_OWNER,
         },
-        data,
+        status,
       ),
     ),
 })
