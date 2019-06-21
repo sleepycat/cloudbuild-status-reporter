@@ -25,10 +25,26 @@ const Server = ({ log, createStatus }) => {
     const pubsubMessage = req.body.message
     const data = unencode(pubsubMessage.data)
 
+    if (!data.sourceProvenance) {
+      // Anything coming from Github will have a resolvedRepoSource. Someone is
+      // using clouldbuild directly, so ack with a 200, 201, 202, 204, or 102
+      // so it doesn't get resent, but do nothing.
+      console.log(
+        'Received data with no sourceProvenance: ',
+        JSON.stringify(data),
+      )
+      res.status(204).send(`No Content`)
+      return
+    }
+
     if (!data.sourceProvenance.resolvedRepoSource) {
       // Anything coming from Github will have a resolvedRepoSource. Someone is
       // using clouldbuild directly, so ack with a 200, 201, 202, 204, or 102
       // so it doesn't get resent, but do nothing.
+      console.log(
+        'Received data with no resolvedRepoSource: ',
+        JSON.stringify(data),
+      )
       res.status(204).send(`No Content`)
       return
     }
