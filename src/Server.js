@@ -61,7 +61,7 @@ const Server = ({ log, createStatus }) => {
           target_url: data.logUrl,
           description: message,
           sha: data.sourceProvenance.resolvedRepoSource.commitSha,
-          context: 'CloudBuild',
+          context: `CloudBuild-${data.buildTriggerId}`,
         },
       },
     )
