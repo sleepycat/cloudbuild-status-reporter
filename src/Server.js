@@ -29,10 +29,7 @@ const Server = ({ log, createStatus }) => {
       // Anything coming from Github will have a resolvedRepoSource. Someone is
       // using clouldbuild directly, so ack with a 200, 201, 202, 204, or 102
       // so it doesn't get resent, but do nothing.
-      console.log(
-        'Received data with no sourceProvenance: ',
-        JSON.stringify(data),
-      )
+      log('Received data with no sourceProvenance: ', JSON.stringify(data))
       res.status(204).send(`No Content`)
       return
     }
@@ -41,10 +38,7 @@ const Server = ({ log, createStatus }) => {
       // Anything coming from Github will have a resolvedRepoSource. Someone is
       // using clouldbuild directly, so ack with a 200, 201, 202, 204, or 102
       // so it doesn't get resent, but do nothing.
-      console.log(
-        'Received data with no resolvedRepoSource: ',
-        JSON.stringify(data),
-      )
+      log('Received data with no resolvedRepoSource: ', JSON.stringify(data))
       res.status(204).send(`No Content`)
       return
     }
