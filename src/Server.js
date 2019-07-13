@@ -60,7 +60,7 @@ const Server = ({ log, createStatus }) => {
       },
     )
 
-    for (let buildId of Object.keys(builds)) {
+    for (const buildId of Object.keys(builds)) {
       // TODO: this is optimistic. What if this goes wrong?
       log('creating status: ', builds[buildId])
       createStatus(builds[buildId])

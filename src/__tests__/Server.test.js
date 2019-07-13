@@ -39,7 +39,7 @@ describe('POST /', () => {
 
   describe('when recieving a second message', () => {
     it('calls createStatus once for each build trigger', async () => {
-      let mock = jest.fn()
+      const mock = jest.fn()
       const server = Server({
         log: jest.fn(),
         createStatus: mock,
