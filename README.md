@@ -1,16 +1,25 @@
-# Reporter
+# cloudbuild-status-reporter
 
-Integration between Cloudbuild and Github is currently very simplistic. The
-goal here is to leverage Cloud Run to provide a monorepo friendly integration
-where the status of multiple builds are communicated back to github from
-CloudBuild.
+Integration between Cloudbuild and Github is currently very simplistic.  If you
+have a single `cloudbuild.yaml` file in your project root, life is good for
+you.
+
+For those with a monorepo setup, creating a cloudbuild trigger pointing at
+cloudbuild.yaml files in subfolders means your builds will be triggered as
+expected but their status will never make it back to Github. This project
+solves that problem.
+
+cloudbuild-status-reporter is a container meant to be used with Cloud Run to
+communicate the status of multiple builds back to Github.
 
 ## Getting it working
 
 Enabling the Cloudbuild API for your project will automatically create a
 cloud-builds topic.
 
-Next, you need to ensure that pubsub has permission to invoke your Cloud Run container:
+Next, you need to ensure that pubsub has permission to invoke your Cloud Run
+container:
+
 ```sh
 gcloud projects add-iam-policy-binding [PROJECT-ID] \
  --member=serviceAccount:service-[PROJECT-NUMBER]@gcp-sa-pubsub.iam.gserviceaccount.com \
