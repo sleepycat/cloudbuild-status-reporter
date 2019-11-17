@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/sleepycat/cloudbuild-status-reporter#readme",
   "dependencies": {
+    "@google-cloud/cloudbuild": "^1.1.0",
     "@octokit/rest": "^16.34.1",
     "ajv": "^6.10.2",
     "dotenv-safe": "^8.1.0",

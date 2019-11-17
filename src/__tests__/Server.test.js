@@ -8,6 +8,9 @@ describe('POST /', () => {
       const server = Server({
         log: jest.fn(),
         createStatus: jest.fn(),
+        triggers: {
+          '53aa33ab-3358-4a9a-843b-6f168bc5d60b': 'foo',
+        },
       })
       const response = await request(server)
         .post('/')
@@ -23,6 +26,9 @@ describe('POST /', () => {
       const server = Server({
         log: mockStdout,
         createStatus: jest.fn(),
+        triggers: {
+          '53aa33ab-3358-4a9a-843b-6f168bc5d60b': 'foo',
+        },
       })
       await request(server)
         .post('/')
@@ -43,6 +49,11 @@ describe('POST /', () => {
       const server = Server({
         log: jest.fn(),
         createStatus: mock,
+        // these trigger ids are encoded in the data:
+        triggers: {
+          'f518a039-a7c0-470b-9de0-77a89a2ad661': 'foo',
+          'b0fff0f1-0b62-4153-8488-b0b05e79ff01': 'bar',
+        },
       })
 
       await request(server)
@@ -82,7 +93,7 @@ describe('POST /', () => {
       expect(mock.mock.calls).toEqual([
         [
           {
-            context: 'CloudBuild-b0fff0f1-0b62-4153-8488-b0b05e79ff01',
+            context: 'CloudBuild: bar',
             description: 'Queueing cloud build',
             sha: 'b536ad0fa83819a1b904d429de3439fdf7a1e8b6',
             state: 'pending',
@@ -92,7 +103,7 @@ describe('POST /', () => {
         ],
         [
           {
-            context: 'CloudBuild-f518a039-a7c0-470b-9de0-77a89a2ad661',
+            context: 'CloudBuild: foo',
             description: 'Running cloud build',
             sha: 'b536ad0fa83819a1b904d429de3439fdf7a1e8b6',
             state: 'pending',
@@ -109,6 +120,9 @@ describe('POST /', () => {
       const server = Server({
         log: jest.fn(),
         createStatus: jest.fn(),
+        triggers: {
+          '53aa33ab-3358-4a9a-843b-6f168bc5d60b': 'foo',
+        },
       })
       const response = await request(server)
         .post('/')
@@ -193,6 +207,9 @@ describe('POST /', () => {
       const server = Server({
         log: jest.fn(),
         createStatus: mockCreateStatus,
+        triggers: {
+          '53aa33ab-3358-4a9a-843b-6f168bc5d60b': 'foo',
+        },
       })
       const response = await request(server)
         .post('/')

@@ -5,7 +5,7 @@ const { toState } = require('./toState')
 const { unencode } = require('./encoding')
 const Ajv = require('ajv')
 
-const Server = ({ log, createStatus }) => {
+const Server = ({ triggers, log, createStatus }) => {
   const app = express()
 
   let builds = {}
@@ -55,7 +55,7 @@ const Server = ({ log, createStatus }) => {
           target_url: data.logUrl,
           description: message,
           sha: data.sourceProvenance.resolvedRepoSource.commitSha,
-          context: `CloudBuild-${data.buildTriggerId}`,
+          context: `CloudBuild: ${triggers[data.buildTriggerId]}`,
         },
       },
     )
