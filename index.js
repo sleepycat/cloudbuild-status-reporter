@@ -1,10 +1,16 @@
 require('dotenv-safe').config()
 const Octokit = require('@octokit/rest')
 const { Server } = require('./src/Server.js')
-const PORT = process.env.PORT || 8080
+const {
+  PORT = 8080,
+  GITHUB_TOKEN,
+  REPO_NAME,
+  REPO_OWNER,
+  GCP_PROJECT,
+} = process.env
 
 const octokit = Octokit({
-  auth: process.env.GITHUB_TOKEN,
+  auth: GITHUB_TOKEN,
 })
 
 const server = Server({
@@ -13,8 +19,8 @@ const server = Server({
     octokit.repos.createStatus(
       Object.assign(
         {
-          repo: process.env.REPO_NAME,
-          owner: process.env.REPO_OWNER,
+          repo: REPO_NAME,
+          owner: REPO_OWNER,
         },
         status,
       ),
