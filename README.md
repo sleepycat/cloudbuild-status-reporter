@@ -14,52 +14,57 @@ communicate the status of multiple builds back to Github.
 
 ## Getting it working
 
-Enabling the Cloudbuild API for your project will automatically create a
-cloud-builds topic.
+There is a little bit of wiring work that needs to get done, but it's not as bad as it looks.
 
-Next, you need to ensure that pubsub has permission to invoke your Cloud Run
-container:
-
-```sh
-gcloud projects add-iam-policy-binding propertygraph \
- --member=serviceAccount:service-861907550287@gcp-sa-pubsub.iam.gserviceaccount.com \
- --role=roles/run.invoker
-
-gcloud iam service-accounts create cloud-run-pubsub-invoker \
-     --display-name "Cloud Run Pub/Sub Invoker"
-```
-
-You'll also need a service account for the reporter to use to lookup the build triggers names:
-
-```sh
-gcloud iam service-accounts create build-trigger-viewer --display-name "Build trigger viewer"
-
-gcloud projects add-iam-policy-binding [PROJECT-ID] \
- --member=serviceAccount:build-trigger-viewer@[PROJECT-ID].iam.gserviceaccount.com \
- --role=roles/cloudbuild.builds.viewer
-```
-
-Then build yourself a copy of this image and push it to your project:
-
-```sh
-docker build -t gcr.io/[PROJECT-ID]/cloudbuild-status-reporter .
-docker push gcr.io/[PROJECT-ID]/cloudbuild-status-reporter
-```
-
-Deploying the Cloud Run container requires a Github token that must be created in [your
+First, deploying the Cloud Run container requires a Github token that must be created in [your
 settings](https://github.com/settings/tokens). The token needs to have the
 repo scope to create the status on the PR.
 
-With that created we can deploy our endpoint and create a subscription that points to it:
+Next, clone this repo and build.
 
 ```sh
-gcloud beta run deploy --service-account=build-trigger-viewer@[PROJECT-ID].iam.gserviceaccount.com \
-  --platform=managed --region=us-central1 \
- --set-env-vars=GCP_PROJECT=your_gcp_project,GITHUB_TOKEN=1234,REPO_NAME=github_repo_name,REPO_OWNER=github_user_name \
- --allow-unauthenticated --image gcr.io/[PROJECT-ID]/cloudbuild-status-reporter cloudbuild-status-reporter
+$ git clone git@github.com:sleepycat/cloudbuild-status-reporter.git && cd cloudbuild-status-reporter
+# Build yourself a copy of the image and push it to your registry:
+$ docker build -t gcr.io/[PROJECT_ID]/cloudbuild-status-reporter .
+$ docker push gcr.io/[PROJECT_ID]/cloudbuild-status-reporter
+```
 
-# Take the URL that command gives you and use it as a pubsub endpoint:
-gcloud pubsub subscriptions create --push-endpoint=https://cloudbuild-status-reporter-qf7voqbyya-uc.a.run.app --topic=cloud-builds cbrun
+Cloudbuild automatically creates a pubsub topic and sends updates to it. We need to access that.
+
+```sh
+# Enable cloudbuild
+$ gcloud services enable cloudbuild.googleapis.com
+# Notice that enabling cloudbuild creates a pubsub topic with build info
+$ gcloud pubsub topics list
+---
+name: projects/[PROJECT_ID]/topics/cloud-builds
+```
+We want the pubsub service to be able to invoke Cloud Run. It'll need accounts and permissions for that.
+
+```sh
+# Create a service account so pubsub can invoke Cloud Run
+$ gcloud iam service-accounts create cloud-run-pubsub-invoker --display-name "Cloud Run Pub/Sub Invoker"
+$ gcloud iam service-accounts list
+NAME                                    EMAIL                                                                      DISABLED
+Cloud Run Pub/Sub Invoker               cloud-run-pubsub-invoker@[PROJECT_ID].iam.gserviceaccount.com              False
+```
+
+The cloudbuild-status-reporter needs a service account and permission to access trigger details to be able to able to report meaningful details back to Github.
+
+```
+# Create a Service account for the container to use to get trigger names
+$ gcloud iam service-accounts create build-trigger-viewer --display-name "Build trigger viewer"
+# Give permission for that account to access build triggers
+$ gcloud projects add-iam-policy-binding government-as-a-platform --member=serviceAccount:build-trigger-viewer@[PROJECT_ID].iam.gserviceaccount.com --role=roles/cloudbuild.builds.viewer
+```
+
+Finally, we'll deploy a Cloud Run service based on that image, and then use the service URL to subscribe to the cloudbuild pubsub topic:
+
+```
+# Deploy a Cloud Run service based on that image
+$ gcloud beta run deploy --service-account=build-trigger-viewer@[PROJECT_ID].iam.gserviceaccount.com --platform=managed --region=us-central1 --set-env-vars=GCP_PROJECT=[PROJECT_ID],GITHUB_TOKEN=[YOUR_GITHUB_TOKEN],REPO_NAME=[YOUR_REPO_NAME],REPO_OWNER=[GITHUB_ORG_OR_USERNAME] --allow-unauthenticated --image gcr.io/[PROJECT_ID]/cloudbuild-status-reporter cloudbuild-status-reporter
+$ gcloud run services add-iam-policy-binding cloudbuild-status-reporter --member=serviceAccount:cloud-run-pubsub-invoker@[PROJECT_ID].iam.gserviceaccount.com --role=roles/run.invoker --platform managed --region=us-central1
+$ gcloud pubsub subscriptions create --push-endpoint=[THE_CLOUD_RUN_SERVICE_URL] --topic=cloud-builds cloudbuild-status-reporter
 ```
 
 ## TODO
