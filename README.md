@@ -55,7 +55,7 @@ The cloudbuild-status-reporter needs a service account and permission to access 
 # Create a Service account for the container to use to get trigger names
 $ gcloud iam service-accounts create build-trigger-viewer --display-name "Build trigger viewer"
 # Give permission for that account to access build triggers
-$ gcloud projects add-iam-policy-binding government-as-a-platform --member=serviceAccount:build-trigger-viewer@[PROJECT_ID].iam.gserviceaccount.com --role=roles/cloudbuild.builds.viewer
+$ gcloud projects add-iam-policy-binding PROJECT_ID --member=serviceAccount:build-trigger-viewer@[PROJECT_ID].iam.gserviceaccount.com --role=roles/cloudbuild.builds.viewer
 ```
 
 Finally, we'll deploy a Cloud Run service based on that image, and then use the service URL to subscribe to the cloudbuild pubsub topic:
