@@ -1,5 +1,5 @@
 require('dotenv-safe').config()
-const Octokit = require('@octokit/rest')
+const { Octokit } = require('@octokit/rest')
 const { CloudBuildClient } = require('@google-cloud/cloudbuild')
 const cb = new CloudBuildClient()
 const { Server } = require('./src/Server.js')
@@ -13,7 +13,7 @@ const {
   GCP_PROJECT,
 } = process.env
 
-const octokit = Octokit({
+const octokit = new Octokit({
   auth: GITHUB_TOKEN,
 })
 
@@ -21,12 +21,15 @@ const octokit = Octokit({
   const triggerList = await listTriggers(cb, GCP_PROJECT)
   const triggers = buildTriggerMap(triggerList)
 
-	console.log('watching for builds from the follow triggers:', JSON.stringify(triggers, null, 2))
+  console.log(
+    'watching for builds from the follow triggers:',
+    JSON.stringify(triggers, null, 2),
+  )
 
   const server = Server({
     log: console.log,
     triggers,
-    createStatus: status =>
+    createStatus: (status) =>
       octokit.repos.createStatus(
         Object.assign(
           {

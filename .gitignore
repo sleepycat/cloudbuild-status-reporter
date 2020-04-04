@@ -7,3 +7,4 @@ api/.env.test
 build-sizes.json
 data
 coverage
+.env
