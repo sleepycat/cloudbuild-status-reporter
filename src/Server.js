@@ -43,8 +43,6 @@ const Server = ({ triggers, log, createStatus }) => {
       return
     }
 
-    log('the whole event:', JSON.stringify(req.body.message))
-
     const { message, state } = toState(pubsubMessage.attributes.status)
 
     builds = Object.assign(
@@ -62,7 +60,7 @@ const Server = ({ triggers, log, createStatus }) => {
 
     for (const buildId of Object.keys(builds)) {
       // TODO: this is optimistic. What if this goes wrong?
-      log('creating status: ', builds[buildId])
+      log('creating status: ', JSON.stringify(builds[buildId]))
       createStatus(builds[buildId])
     }
 

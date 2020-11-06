@@ -23,7 +23,7 @@ const octokit = new Octokit({
 
   console.log(
     'watching for builds from the follow triggers:',
-    JSON.stringify(triggers, null, 2),
+    JSON.stringify(triggers),
   )
 
   const server = Server({
