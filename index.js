@@ -30,7 +30,7 @@ const octokit = new Octokit({
     log: console.log,
     triggers,
     createStatus: (status) =>
-      octokit.repos.createStatus(
+      octokit.repos.createCommitStatus(
         Object.assign(
           {
             repo: REPO_NAME,
