@@ -38,7 +38,7 @@ describe('POST /', () => {
 
       expect(mockStdout).toHaveBeenCalledWith(
         'Malformed Pub/Sub message received:',
-        '[{"keyword":"required","dataPath":"","schemaPath":"#/required","params":{"missingProperty":"message"},"message":"should have required property \'message\'"}]',
+				'[{"instancePath":"","schemaPath":"#/required","keyword":"required","params":{"missingProperty":"message"},"message":"must have required property \'message\'"}]',
       )
     })
   })
