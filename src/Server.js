@@ -17,8 +17,13 @@ const Server = ({ triggers, log, createStatus }) => {
     const valid = ajv.validate(messageSchema, req.body)
 
     if (!valid) {
-      log('Malformed Pub/Sub message received:', JSON.stringify(ajv.errors))
-      res.status(400).send(`Bad Request`)
+      log({
+        error: 'Malformed Pub/Sub message received',
+        validation: ajv.errors,
+        requestBody: req.body,
+      })
+      // ack 20X to prevent retries
+      res.status(204).send('No Content')
       return
     }
 
@@ -63,7 +68,7 @@ const Server = ({ triggers, log, createStatus }) => {
       log('creating status: ', JSON.stringify(builds[buildId]))
       createStatus(builds[buildId])
     }
-
+    // ack
     res.status(204).send('No Content')
   })
 
