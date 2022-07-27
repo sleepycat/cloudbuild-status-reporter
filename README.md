@@ -62,7 +62,7 @@ Finally, we'll deploy a Cloud Run service based on that image, and then use the 
 
 ```
 # Deploy a Cloud Run service based on that image
-$ gcloud beta run deploy --service-account=build-trigger-viewer@[PROJECT_ID].iam.gserviceaccount.com --platform=managed --region=us-central1 --set-env-vars=GCP_PROJECT=[PROJECT_ID],GITHUB_TOKEN=[YOUR_GITHUB_TOKEN],REPO_NAME=[YOUR_REPO_NAME],REPO_OWNER=[GITHUB_ORG_OR_USERNAME] --allow-unauthenticated --image gcr.io/[PROJECT_ID]/cloudbuild-status-reporter cloudbuild-status-reporter
+$ gcloud beta run deploy --service-account=build-trigger-viewer@[PROJECT_ID].iam.gserviceaccount.com --platform=managed --region=us-central1 --set-env-vars=GCP_PROJECT=[PROJECT_ID],GCP_TRIGGER_REGION=[REGION_TRIGGERS_RUN_IN],GITHUB_TOKEN=[YOUR_GITHUB_TOKEN],REPO_NAME=[YOUR_REPO_NAME],REPO_OWNER=[GITHUB_ORG_OR_USERNAME] --allow-unauthenticated --image gcr.io/[PROJECT_ID]/cloudbuild-status-reporter cloudbuild-status-reporter
 $ gcloud run services add-iam-policy-binding cloudbuild-status-reporter --member=serviceAccount:cloud-run-pubsub-invoker@[PROJECT_ID].iam.gserviceaccount.com --role=roles/run.invoker --platform managed --region=us-central1
 $ gcloud pubsub subscriptions create --push-endpoint=[THE_CLOUD_RUN_SERVICE_URL] --topic=cloud-builds cloudbuild-status-reporter
 ```

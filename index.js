@@ -11,6 +11,7 @@ const {
   REPO_NAME,
   REPO_OWNER,
   GCP_PROJECT,
+  GCP_TRIGGER_REGION,
 } = process.env
 
 const octokit = new Octokit({
@@ -18,7 +19,11 @@ const octokit = new Octokit({
 })
 
 ;(async () => {
-  const triggerList = await listTriggers(cb, GCP_PROJECT)
+  const triggerList = await listTriggers({
+    client: cb,
+    projectId: GCP_PROJECT,
+    region: GCP_TRIGGER_REGION,
+  })
   const triggers = buildTriggerMap(triggerList)
 
   console.log(
